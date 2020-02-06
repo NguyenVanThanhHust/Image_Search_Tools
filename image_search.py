@@ -129,6 +129,9 @@ if __name__ == '__main__':
     L = 5  # number of tables
     d = 512 # Dimension of Feature vector
     lsh = LSHash(hash_size=k, input_dim=d, num_hashtables=L)
+    list_feature = list()
+    image_paths = list()
+    
     print("list_author:", list_author.keys())
     for subfolder in list_author.keys():
         subfolder_path = os.path.join(example_image_dir, subfolder)
@@ -140,9 +143,14 @@ if __name__ == '__main__':
         for img in os.listdir(subfolder_path):
             image_path = os.path.join(subfolder_path, img)
             author, confidence, feature = predict_author_single_img(net, image_path)
+            image_paths.append(image_path)
+            list_feature.append(feature)
             lsh.index(feature, extra_data=image_path)
             # print("author: ", author, "  feature: ", feature)
     ## Exporting as pickle
     pickle.dump(lsh, open('lsh.p', "wb"))
     lsh = pickle.load(open('lsh.p','rb'))
+    feature_dict = dict(zip(image_paths, list_feature))
+    pickle.dump(feature_dict, open("feature_dict.p", "wb"))
+    feature_dict = pickle.load(open('feature_dict.p','rb'))
     # app.run()
