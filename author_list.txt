@@ -1,0 +1,14 @@
+{'buffet', 'DoumotoInshou', 'FukuohjiHorin', 'GokuraSenjin', 
+    'GotoSumio', 'HashimotoMeiji', 'hayashi', 'HigashiyamaKaii', 
+    'hirayama', 'Ikeda Yoson', 'ItoJakuchu', 'KanashimaKeika', 
+    'KatayamaNanpu', 'KawabataRyushi', 'kawai', 'KawaiGyokudo',
+     'kawase', 'KimuraBuzan', 'KodamaKibo', 'MaedaSeison', 'MakiSusumu', 
+     'maruyama', 'MaruyamaOkyo', 'MatsudaShohei', 'MatsuoToshio', 
+     'miro', 'MoritaKohei', 'NabatameKoichi', 'NagasawaRosetsu', 
+     'nakajima', 'NakajiYujin', 'NakamuraGakuryo', 'OhashiSuiseki', 
+     'OhyamaChusaku', 'OkudaGenso', 'OkumuraTogyu', 'OnoChikkyo', 
+     'picasso', 'saito', 'sakai', 'SakaiHoitsu', 'ShimomuraKanzan', 
+     'TakeuchiSeiho', 'TokuokaShinsen', 'TomitaKeisen', 'UdaTekison', 
+     'uemura', 'UemuraShoen', 'UemuraShoko', 'YamaguchiKayo', 'YokoyamaTaikan'}
+
+
