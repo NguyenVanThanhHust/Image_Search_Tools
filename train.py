@@ -25,7 +25,7 @@ from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 
 from conf import settings
-from utils import get_network, get_training_dataloader, get_test_dataloader, WarmUpLR
+from utils_ai import get_network, get_training_dataloader, get_test_dataloader, WarmUpLR
 
 def train(epoch):
 
@@ -137,8 +137,6 @@ if __name__ == '__main__':
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=settings.MILESTONES, gamma=0.2) #learning rate decay
     iter_per_epoch = len(cifar100_training_loader)
     warmup_scheduler = WarmUpLR(optimizer, iter_per_epoch * args.warm)
-    # checkpoint_net_path = os.path.join(settings.CHECKPOINT_PATH, args.net)
-    # checkpoint_path = os.path.join(checkpoint_net_path, settings.TIME_NOW)
     checkpoint_path = './checkpoint/results'
     
     #use tensorboard
@@ -170,5 +168,3 @@ if __name__ == '__main__':
 
         if not epoch % settings.SAVE_EPOCH:
             torch.save(net.state_dict(), checkpoint_path.format(net=args.net, epoch=epoch, type='regular'))
-
-    # writer.close()

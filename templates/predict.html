@@ -10,13 +10,33 @@
 </html>
 -->
 
-
 <!DOCTYPE html>
-<html>
-<body>
+<html lang="en">
+<head>
+  <meta charset=utf-8 />
+  <title></title>
+  <style>
+    div.container {
+      display:inline-block;
+    }
 
-<h2>HTML Image</h2>
-<img src="{{imgpath}}" alt="Haruki Murakami" width="500" height="333">
+    p {
+      text-align:center;
+    }
+  </style>
+</head>
 
-</body>
+<h1>Top similar predictions:</h1>
+<div class="container">
+    <img src="{{img_1}}" width="200"/>
+    <p>"{{labels_1}}"</p>
+</div>
+<div class="container">
+	<img src="{{img_2}}" width="200"/>
+	<p>"{{labels_2}}"</p>
+</div>
+<div class="container">
+	<img src="{{img_3}}" width="200"/>
+	<p>"{{labels_3}}"</p>
+</div>
 </html>

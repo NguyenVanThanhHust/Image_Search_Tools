@@ -10,6 +10,7 @@ import webbrowser
 from flask import Flask, request, render_template, flash, redirect, url_for, session, jsonify
 from werkzeug import secure_filename
 from PIL import Image
+from shutil import copy
 
 import torch
 from torchvision import transforms
@@ -17,7 +18,8 @@ from torchvision import datasets
 
 from lshash import LSHash
 from conf import settings
-from utils import build_network
+from utils_ai import build_network
+from utils import get_class_name_from_string
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,15 @@ handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 
-def get_similar_item_image(imgpath, n_items=5):
+UPLOAD_FOLDER = './static/uploads'
+RESULT_FOLDER = './static/results'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+
+app = Flask(__name__)
+app.secret_key = 'random secret key'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def get_similar_item_image(imgpath, n_items=3):
     global net
     global feature_dict
     global lsh
@@ -44,18 +54,17 @@ def get_similar_item_image(imgpath, n_items=5):
     print("image name: ", imgpath)
     response = lsh.query(feature, 
                      num_results=n_items+1, distance_func='l1norm')
-    return response[0][0][1], response[3][0][1], response[2][0][1]
-
-def get_similar_item(idx, feature_dict, lsh_variable, n_items=5):
-    print("image name: ", list(feature_dict.keys())[idx])
-    response = lsh_variable.query(feature_dict[list(feature_dict.keys())[idx]].flatten(), 
-                     num_results=n_items+1, distance_func='l1norm')
-    return response[0][0][1], response[3][0][1], response[2][0][1]
+    path_1, path_2, path_3 = response[1][0][1], response[2][0][1], response[3][0][1]
+    label_1 = get_class_name_from_string(path_1)
+    label_2 = get_class_name_from_string(path_2)
+    label_3 = get_class_name_from_string(path_3)
+    paths = [path_1, path_2, path_3]
+    labels = [label_1, label_2, label_3]
+    return labels, paths
 
 def get_feature_single_img(image_path):
     global net
     """
-    
     """
     device = torch.device("cuda")
     image_transforms =  transforms.Compose([
@@ -114,12 +123,6 @@ def allowed_file(filename):
         return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-UPLOAD_FOLDER = './static/uploads'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
-
-app = Flask(__name__)
-app.secret_key = 'random secret key'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/", methods=['GET', 'POST'])
 def upload_file():
@@ -146,8 +149,8 @@ def upload_file():
             return redirect(url_for('predict'))
     return '''
     <!DOCTYPE html>
-    <title>Cars Classification</title>
-    <h1>Cars Classification</h1>
+    <title>Objects Classification</title>
+    <h1>Objects Classification</h1>
     <h2>Upload new file</h2>
     <form method=post enctype=multipart/form-data>
         Image File:<input type=file name=file>
@@ -160,32 +163,15 @@ def upload_file():
     </form>
     '''
  
-def classify_image(img, imgpath=""):
-    img_tensor = preprocess(img).unsqueeze(0)
-    features_var = model(Variable(img_tensor)).data.numpy()
-    num_input_features = len(features_var)
-    k = 5
-
-    _, I = index.search(features_var, k)
-    for i in range(num_input_features):
-        suggested_labels = []
-        suggested_filenames = []
-        for idx in I[i]:
-            suggested_filenames.append(train_labels[idx])
-            suggested_label = train_labels[idx].split('/')[0]
-            suggested_labels.append(suggested_label)
-        print("suggested_labels", suggested_labels)
-    pred_class = suggested_labels[0]
-
-    app.logger.info("Execution time: %0.02f seconds" % (dt))
-    app.logger.info("Image %s classified as %s" % (imgpath, pred_class))
-
-    return (suggested_labels, suggested_filenames)
-    
 @app.route('/predict')
 def predict():
     global net
     session_keys = list(session.keys())
+    # remove old file from previous prediction
+    list_file = [f for f in os.listdir(RESULT_FOLDER) if os.path.isfile(os.path.join(RESULT_FOLDER, f))]
+    for file in list_file:
+        os.remove(os.path.join(RESULT_FOLDER, file))
+        
     url = session['url'] if 'url' in session_keys else ''
     imgpath = session['imgpath'] if 'imgpath' in session_keys else ''
     if url:
@@ -198,17 +184,16 @@ def predict():
     else:
         imgpath = 'static/uploads/rav4.jpg'
         img = Image.open(imgpath).convert('RGB')
-    # path_1, path_2, path_3 = get_similar_item_image(img, imgpath=imgpath)
-    
-    path_1, path_2, path_3 = get_similar_item_image(imgpath)
-    print(path_1)
-    print(path_2)
-    print(path_3)
-    # return render_template('predict.html', suggested_labels=suggested_labels, imgpath=imgpath, suggested_filenames=suggested_filenames)
-    # return render_template('predict.html', suggested_labels="Haruki Murakimi", imgpath=path_2, suggested_filenames=path_2)
-    img_1 = Image.open(path_2)
-    img_1.show() 
-    return 'ok'
+        
+    labels, paths = get_similar_item_image(imgpath)
+    for path in paths:
+        copy(path, RESULT_FOLDER)
+    list_file = [f for f in os.listdir(RESULT_FOLDER) if os.path.isfile(os.path.join(RESULT_FOLDER, f))]
+    filepaths = [os.path.join(RESULT_FOLDER, file) for file in list_file]
+    path_1, path_2, path_3 = filepaths[0], filepaths[1], filepaths[2] 
+    return render_template('predict.html', 
+                           img_1=path_1, img_2 = path_2, img_3 = path_3, 
+                           labels_1 = labels[0], labels_2 = labels[1], labels_3 = labels[2])
 
 def create_feature(list_author, net):
     global example_image_dir
@@ -273,10 +258,4 @@ if __name__ == '__main__':
         feature_dict = dict(zip(image_paths, list_features))
         pickle.dump(feature_dict, open("feature_dict.p", "wb"))
     
-    for i in range(10):
-        path_1, path_2, path_3 = get_similar_item(i, feature_dict, lsh,5)
-        print(path_1)
-        print(path_2)
-        print(path_3)
-        print(10 * "---")
-        app.run()
+    app.run()
