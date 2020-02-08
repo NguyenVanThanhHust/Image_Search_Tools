@@ -18,7 +18,7 @@ from torchvision import datasets
 
 from lshash import LSHash
 from conf import settings
-from utils_ai import build_network
+from utils_ai import build_network, get_feature_single_img, create_feature
 from utils import get_class_name_from_string
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ def get_similar_item_image(imgpath, n_items=3):
     global net
     global feature_dict
     global lsh
-    feature = get_feature_single_img(imgpath)
+    feature = get_feature_single_img(net, imgpath)
     print("image name: ", imgpath)
     response = lsh.query(feature, 
                      num_results=n_items+1, distance_func='l1norm')
@@ -62,67 +62,9 @@ def get_similar_item_image(imgpath, n_items=3):
     labels = [label_1, label_2, label_3]
     return labels, paths
 
-def get_feature_single_img(image_path):
-    global net
-    """
-    """
-    device = torch.device("cuda")
-    image_transforms =  transforms.Compose([
-                        transforms.Resize((112, 112)),
-                        transforms.ToTensor(),
-                        transforms.Normalize(settings.CIFAR100_TRAIN_MEAN, 
-                                             settings.CIFAR100_TRAIN_STD)])
-
-    img = Image.open(image_path)
-    img_tensor = image_transforms(img)
-    model = net
-    if torch.cuda.is_available():
-        img_tensor = img_tensor.view(1, 3, 112, 112).cuda()
-    else:
-        img_tensor = img_tensor.view(1, 3, 112, 112)
-    with torch.no_grad():
-        model.eval()
-        # model ouputs log probabilities
-        out = model(img_tensor)  # <class 'torch.Tensor'>  torch.Size([1, 58])
-        ps = torch.exp(out) #  <class 'torch.Tensor'> torch.Size([1, 58])
-        feature = ps.cpu().numpy()[0]
-    return feature
-
-def predict_author_single_img(model, image_path):
-    """
-    
-    """
-    device = torch.device("cuda")
-    image_transforms =  transforms.Compose([
-                        transforms.Resize((112, 112)),
-                        transforms.ToTensor(),
-                        transforms.Normalize(settings.CIFAR100_TRAIN_MEAN, 
-                                             settings.CIFAR100_TRAIN_STD)])
-
-    img = Image.open(image_path)
-    img_tensor = image_transforms(img)
-
-    if torch.cuda.is_available():
-        img_tensor = img_tensor.view(1, 3, 112, 112).cuda()
-    else:
-        img_tensor = img_tensor.view(1, 3, 112, 112)
-    with torch.no_grad():
-        model.eval()
-        # model ouputs log probabilities
-        out = model(img_tensor)  # <class 'torch.Tensor'>  torch.Size([1, 58])
-        ps = torch.exp(out) #  <class 'torch.Tensor'> torch.Size([1, 58])
-        feature = ps.cpu().numpy()[0]
-
-        topk, topclass = ps.topk(3, dim=1)
-        
-        sum_topk = int(topk.cpu().numpy()[0][0]) + int(topk.cpu().numpy()[0][1]) + int(topk.cpu().numpy()[0][2])
-    return idx_to_class[topclass.cpu().numpy()[0][0]], (topk.cpu().numpy()[0][0])/sum_topk, feature
-
-
 def allowed_file(filename):
         return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 @app.route("/", methods=['GET', 'POST'])
 def upload_file():
@@ -195,31 +137,6 @@ def predict():
                            img_1=path_1, img_2 = path_2, img_3 = path_3, 
                            labels_1 = labels[0], labels_2 = labels[1], labels_3 = labels[2])
 
-def create_feature(list_author, net):
-    global example_image_dir
-    list_feature = list()
-    image_paths = list()
-    ## Locality Sensitive Hashing
-    k = 10 # hash size
-    L = 5  # number of tables
-    d = 58 # Dimension of Feature vector
-    lsh = LSHash(hash_size=k, input_dim=d, num_hashtables=L)
-    for subfolder in list_author.keys():
-        subfolder_path = os.path.join(example_image_dir, subfolder)
-        count_items = len([name for name in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, name))])
-        # print(subfolder)
-        sum_acc = 0
-        sum_confiden = 0
-
-        for img in os.listdir(subfolder_path):
-            image_path = os.path.join(subfolder_path, img)
-            author, confidence, feature = predict_author_single_img(net, image_path)
-            image_paths.append(image_path)
-            list_feature.append(feature)
-            lsh.index(feature, extra_data=image_path)
-    pickle.dump(lsh, open('lsh.p', "wb"))
-    return lsh, image_paths, list_feature
-            
 if __name__ == '__main__':
     
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
