@@ -267,8 +267,9 @@ def create_feature(train_image_dir, classes, net):
     lsh = LSHash(hash_size=k, input_dim=d, num_hashtables=L)
     for each_object in classes:
         each_object_path = os.path.join(train_image_dir, each_object)
-
-        for img in os.listdir(each_object_path):
+        list_img = next(os.walk(each_object_path))[2]
+        print("hassing class: ", each_object, " which has: ", len(list_img))
+        for img in list_img:
             image_path = os.path.join(each_object_path, img)
             feature = get_feature_single_img(net, image_path)
             image_paths.append(image_path)

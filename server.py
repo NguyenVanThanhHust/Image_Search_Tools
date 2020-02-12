@@ -51,10 +51,10 @@ def get_similar_item_image(imgpath, n_items=3):
     global feature_dict
     global lsh
     feature = get_feature_single_img(net, imgpath)
-    print("image name: ", imgpath)
+    # print("image name: ", imgpath)
     response = lsh.query(feature, 
-                     num_results=n_items+1, distance_func='l1norm')
-    print("response: ", response)
+                     num_results=n_items+1, distance_func='hamming')
+
     path_1, path_2, path_3 = response[1][0][1], response[2][0][1], response[3][0][1]
     label_1 = get_class_name_from_string(path_1)
     label_2 = get_class_name_from_string(path_2)
