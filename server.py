@@ -159,7 +159,7 @@ if __name__ == '__main__':
     net.load_state_dict(torch.load(args_dict['weights']), args_dict['gpu'])
     net.eval()
 
-    example_image_dir = 'D:/SealProjectOLD/Datasets/images/val'
+    example_image_dir = '../../SealProjectOLD/Datasets/images/val'
     dataset = datasets.ImageFolder(example_image_dir, transform= None)
     idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
     json_file = open('author_data.json')

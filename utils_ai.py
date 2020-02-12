@@ -147,7 +147,7 @@ def build_network(archi = 'squeezenet', use_gpu=True):
 
     return net
 
-def get_training_dataloader(mean, std, batch_size=32, num_workers=4, shuffle=True):
+def get_training_dataloader(mean, std, train_path="",batch_size=32, num_workers=4, shuffle=True):
     """ return training dataloader
     Args:
         mean: mean of cifar100 training dataset
@@ -164,14 +164,13 @@ def get_training_dataloader(mean, std, batch_size=32, num_workers=4, shuffle=Tru
         transforms.ToTensor(),
         transforms.Normalize(mean, std)
     ])
-    train_path = 'D:/SealProject/Vgg16/new_train'
-    cifar100_training = torchvision.datasets.ImageFolder(root=train_path, transform=transform_train)
-    cifar100_training_loader = torch.utils.data.DataLoader(
-        cifar100_training, shuffle=shuffle, num_workers=num_workers, batch_size=batch_size)
+    training = torchvision.datasets.ImageFolder(root=train_path, transform=transform_train)
+    training_loader = torch.utils.data.DataLoader(
+        training, shuffle=shuffle, num_workers=num_workers, batch_size=batch_size)
 
-    return cifar100_training_loader
+    return training_loader
 
-def get_test_dataloader(mean, std, batch_size=32, num_workers=4, shuffle=True):
+def get_test_dataloader(mean, std, test_path="", batch_size=32, num_workers=4, shuffle=True):
     """ return training dataloader
     Args:
         mean: mean of cifar100 test dataset
@@ -180,7 +179,7 @@ def get_test_dataloader(mean, std, batch_size=32, num_workers=4, shuffle=True):
         batch_size: dataloader batchsize
         num_workers: dataloader num_works
         shuffle: whether to shuffle 
-    Returns: cifar100_test_loader:torch dataloader object
+    Returns: test_loader:torch dataloader object
     """
 
     transform_test = transforms.Compose([
@@ -190,27 +189,27 @@ def get_test_dataloader(mean, std, batch_size=32, num_workers=4, shuffle=True):
     ])
     
     test_path = 'D:/SealProject/Datasets/images/val'
-    cifar100_test = torchvision.datasets.ImageFolder(root=test_path, transform=transform_test)
-    cifar100_test_loader = DataLoader(
-        cifar100_test, shuffle=shuffle, num_workers=num_workers, batch_size=batch_size)
+    test = torchvision.datasets.ImageFolder(root=test_path, transform=transform_test)
+    test_loader = DataLoader(
+        test, shuffle=shuffle, num_workers=num_workers, batch_size=batch_size)
 
-    idx_to_class = {v: k for k, v in cifar100_test.class_to_idx.items()}
+    idx_to_class = {v: k for k, v in test.class_to_idx.items()}
 
-    return cifar100_test_loader, idx_to_class
+    return test_loader, idx_to_class
 
-def compute_mean_std(cifar100_dataset):
+def compute_mean_std(dataset):
     """compute the mean and std of cifar100 dataset
     Args:
-        cifar100_training_dataset or cifar100_test_dataset
+        training_dataset or test_dataset
         witch derived from class torch.utils.data
     
     Returns:
         a tuple contains mean, std value of entire dataset
     """
 
-    data_r = numpy.dstack([cifar100_dataset[i][1][:, :, 0] for i in range(len(cifar100_dataset))])
-    data_g = numpy.dstack([cifar100_dataset[i][1][:, :, 1] for i in range(len(cifar100_dataset))])
-    data_b = numpy.dstack([cifar100_dataset[i][1][:, :, 2] for i in range(len(cifar100_dataset))])
+    data_r = numpy.dstack([dataset[i][1][:, :, 0] for i in range(len(dataset))])
+    data_g = numpy.dstack([dataset[i][1][:, :, 1] for i in range(len(dataset))])
+    data_b = numpy.dstack([dataset[i][1][:, :, 2] for i in range(len(dataset))])
     mean = numpy.mean(data_r), numpy.mean(data_g), numpy.mean(data_b)
     std = numpy.std(data_r), numpy.std(data_g), numpy.std(data_b)
 
@@ -238,8 +237,8 @@ def get_feature_single_img(net, image_path):
     image_transforms =  transforms.Compose([
                         transforms.Resize((112, 112)),
                         transforms.ToTensor(),
-                        transforms.Normalize(settings.CIFAR100_TRAIN_MEAN, 
-                                             settings.CIFAR100_TRAIN_STD)])
+                        transforms.Normalize(settings.TRAIN_MEAN, 
+                                             settings.TRAIN_STD)])
 
     img = Image.open(image_path)
     img_tensor = image_transforms(img)

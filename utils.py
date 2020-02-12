@@ -49,7 +49,4 @@ def copy_folder(class_name, ori_path, dst_path):
     for each_file in test_files:
         src_file_path = os.path.join(ori_path, each_file)
         dst_file_path = os.path.join(test_path, each_file)
-        shutil.copyfile(src_file_path, dst_file_path)
-
-
-     
+        shutil.copyfile(src_file_path, dst_file_path)    
