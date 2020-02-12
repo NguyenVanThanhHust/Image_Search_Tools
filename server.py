@@ -164,7 +164,7 @@ if __name__ == '__main__':
     net.load_state_dict(torch.load(args_dict['weights']), args_dict['gpu'])
     net.eval()
 
-    example_image_dir = '../../SealProjectOLD/Datasets/images/val'
+    example_image_dir = '../datasets/Signature_Recognition/To_Use_Datasets/train'
     dataset = datasets.ImageFolder(example_image_dir, transform= None)
     idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
     
