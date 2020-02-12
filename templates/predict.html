@@ -27,7 +27,7 @@
 </head>
 
 <h1>Top similar predictions:</h1>
-<div class="container">
+<!-- <div class="container">
     <img src="{{img_1}}" width="200"/>
     <p>"{{labels_1}}"</p>
 </div>
@@ -38,5 +38,16 @@
 <div class="container">
 	<img src="{{img_3}}" width="200"/>
 	<p>"{{labels_3}}"</p>
+</div> -->
+<!-- 
+{%for i in range(0, 5)%}
+<img src="{{img_3}}" width="200"/>
+{%endfor%} -->
+
+{%for i in range(0, 5)%}
+<div class="container"></div>
+  <p>{{labels[i]}}</p>
+  <img src="{{img_paths[i]}}" width="200"/>
 </div>
+{%endfor%}
 </html>

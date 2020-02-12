@@ -4,7 +4,7 @@ author baiyu
 """
 
 import sys
-
+import os
 import numpy
 
 import torch
@@ -14,8 +14,10 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 from conf import settings
+from lshash import LSHash
 
-#from dataset import CIFAR100Train, CIFAR100Test
+import pickle
+
 def build_network(archi = 'squeezenet', use_gpu=True):
     """ return given network
     """
@@ -255,8 +257,7 @@ def get_feature_single_img(net, image_path):
         feature = ps.cpu().numpy()[0]
     return feature
 
-def create_feature(list_author, net):
-    global example_image_dir
+def create_feature(train_image_dir, classes, net):
     list_feature = list()
     image_paths = list()
     ## Locality Sensitive Hashing
@@ -264,18 +265,13 @@ def create_feature(list_author, net):
     L = 5  # number of tables
     d = 58 # Dimension of Feature vector
     lsh = LSHash(hash_size=k, input_dim=d, num_hashtables=L)
-    for subfolder in list_author.keys():
-        subfolder_path = os.path.join(example_image_dir, subfolder)
-        count_items = len([name for name in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, name))])
-        # print(subfolder)
-        sum_acc = 0
-        sum_confiden = 0
+    for each_object in classes:
+        each_object_path = os.path.join(train_image_dir, each_object)
 
-        for img in os.listdir(subfolder_path):
-            image_path = os.path.join(subfolder_path, img)
-            author, confidence, feature = predict_author_single_img(net, image_path)
+        for img in os.listdir(each_object_path):
+            image_path = os.path.join(each_object_path, img)
+            feature = get_feature_single_img(net, image_path)
             image_paths.append(image_path)
             list_feature.append(feature)
             lsh.index(feature, extra_data=image_path)
-    pickle.dump(lsh, open('lsh.p', "wb"))
     return lsh, image_paths, list_feature

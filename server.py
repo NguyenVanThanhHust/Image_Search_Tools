@@ -19,7 +19,7 @@ from torchvision import datasets
 from lshash import LSHash
 from conf import settings
 from utils_ai import build_network, get_feature_single_img, create_feature
-from utils import get_class_name_from_string
+from utils_common import get_class_name_from_string
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,7 @@ def get_similar_item_image(imgpath, n_items=3):
     print("image name: ", imgpath)
     response = lsh.query(feature, 
                      num_results=n_items+1, distance_func='l1norm')
+    print("response: ", response)
     path_1, path_2, path_3 = response[1][0][1], response[2][0][1], response[3][0][1]
     label_1 = get_class_name_from_string(path_1)
     label_2 = get_class_name_from_string(path_2)
@@ -132,10 +133,14 @@ def predict():
         copy(path, RESULT_FOLDER)
     list_file = [f for f in os.listdir(RESULT_FOLDER) if os.path.isfile(os.path.join(RESULT_FOLDER, f))]
     filepaths = [os.path.join(RESULT_FOLDER, file) for file in list_file]
+    print("filepaths: ", filepaths)
     path_1, path_2, path_3 = filepaths[0], filepaths[1], filepaths[2] 
+    # return render_template('predict.html', 
+    #                        img_1=path_1, img_2 = path_2, img_3 = path_3, 
+    #                        labels_1 = labels[0], labels_2 = labels[1], labels_3 = labels[2])
     return render_template('predict.html', 
-                           img_1=path_1, img_2 = path_2, img_3 = path_3, 
-                           labels_1 = labels[0], labels_2 = labels[1], labels_3 = labels[2])
+                        img_paths=filepaths, 
+                        labels = labels)
 
 if __name__ == '__main__':
     
@@ -162,17 +167,19 @@ if __name__ == '__main__':
     example_image_dir = '../../SealProjectOLD/Datasets/images/val'
     dataset = datasets.ImageFolder(example_image_dir, transform= None)
     idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
-    json_file = open('author_data.json')
-    list_author = json.load(json_file)
     
+    original_path = "../datasets/Signature_Recognition/Original_Datasets"
+    list_author = next(os.walk(original_path))[1]
     if os.path.isfile('lsh.p'):
         logger.info("load indexed dict")
         lsh = pickle.load(open('lsh.p','rb'))
         feature_dict = pickle.load(open('feature_dict.p','rb'))
     else:
         logger.info("building dict")
-        lsh, image_paths, list_features = create_feature(list_author, net) 
+        train_image_dir = "../datasets/Signature_Recognition/To_Use_Datasets/train"
+        lsh, image_paths, list_features = create_feature(train_image_dir, list_author, net) 
         feature_dict = dict(zip(image_paths, list_features))
+        pickle.dump(lsh, open('lsh.p', "wb"))
         pickle.dump(feature_dict, open("feature_dict.p", "wb"))
     
     app.run()
