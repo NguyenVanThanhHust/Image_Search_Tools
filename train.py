@@ -120,6 +120,10 @@ if __name__ == '__main__':
     val_path=os.path.join(args_dict['data_set'], "val")
     test_path=os.path.join(args_dict['data_set'], "test")
 
+    standard_folder = train_path=os.path.join(args_dict['data_set'], "train")
+    print(standard_folder)
+    list_author = next(os.walk(standard_folder))[1]
+    num_classes = len(list_author)
     net = build_network(archi = net_type, use_gpu=use_gpu, num_classes=num_classes) 
     #data preprocessing:
     training_loader = get_training_dataloader(

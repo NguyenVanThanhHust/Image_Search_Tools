@@ -18,7 +18,7 @@ from lshash import LSHash
 
 import pickle
 
-def build_network(archi = 'squeezenet', use_gpu=True):
+def build_network(archi = 'squeezenet', use_gpu=True, num_classes=10):
     """ return given network
     """
 
