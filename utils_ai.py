@@ -190,7 +190,6 @@ def get_test_dataloader(mean, std, test_path="", batch_size=32, num_workers=4, s
         transforms.Normalize(mean, std)
     ])
     
-    test_path = 'D:/SealProject/Datasets/images/val'
     test = torchvision.datasets.ImageFolder(root=test_path, transform=transform_test)
     test_loader = DataLoader(
         test, shuffle=shuffle, num_workers=num_workers, batch_size=batch_size)

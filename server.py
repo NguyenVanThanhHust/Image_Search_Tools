@@ -135,9 +135,6 @@ def predict():
     filepaths = [os.path.join(RESULT_FOLDER, file) for file in list_file]
     print("filepaths: ", filepaths)
     path_1, path_2, path_3 = filepaths[0], filepaths[1], filepaths[2] 
-    # return render_template('predict.html', 
-    #                        img_1=path_1, img_2 = path_2, img_3 = path_3, 
-    #                        labels_1 = labels[0], labels_2 = labels[1], labels_3 = labels[2])
     return render_template('predict.html', 
                         img_paths=filepaths, 
                         labels = labels)

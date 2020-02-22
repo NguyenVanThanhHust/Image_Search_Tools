@@ -20,7 +20,7 @@ python train.py -net squeezenet
 train_accu not saved
 accuracy 80% 
 
-python train.py -data_set ../datasets/Image_Search_Dataset/ -net shallow_squeezenet -w 2
+python train.py -data_set ../datasets/Image_Search_Dataset/ -net squeezenet -w 2
 train_accu 88%
 accuracy 82%
 

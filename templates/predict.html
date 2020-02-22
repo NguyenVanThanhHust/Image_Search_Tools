@@ -1,15 +1,3 @@
-<!--
-<!DOCTYPE html>
-<html lang="en">
-<img src="{{imgpath}}" width="250"/>
-<h1>Top {{suggested_labels|length}} predictions:</h1>
-{%for i in range(0, suggested_labels|length)%}
-	<p>{{i + 1}}. {{suggested_labels[i]}}</p>
-	<img src="{{"static/VMMRdb/" + suggested_filenames[i]}}" width="200"/>
-{%endfor%}
-</html>
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,28 +14,13 @@
   </style>
 </head>
 
-<h1>Top similar predictions:</h1>
-<!-- <div class="container">
-    <img src="{{img_1}}" width="200"/>
-    <p>"{{labels_1}}"</p>
-</div>
-<div class="container">
-	<img src="{{img_2}}" width="200"/>
-	<p>"{{labels_2}}"</p>
-</div>
-<div class="container">
-	<img src="{{img_3}}" width="200"/>
-	<p>"{{labels_3}}"</p>
-</div> -->
-<!-- 
 {%for i in range(0, 5)%}
-<img src="{{img_3}}" width="200"/>
-{%endfor%} -->
-
-{%for i in range(0, 5)%}
-<div class="container"></div>
+<div class="container">
   <p>{{labels[i]}}</p>
   <img src="{{img_paths[i]}}" width="200"/>
 </div>
 {%endfor%}
 </html>
+
+nvidia-docker run -it --name image_recognition --shm-size 32G -p 2345:2345 -v /home/ubuntu:/workspace/share nvcr.io/nvidia/pytorch:19.08-py3 ls
+

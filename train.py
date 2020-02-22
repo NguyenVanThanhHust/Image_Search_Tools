@@ -6,9 +6,12 @@
 author baiyu
 """
 
+import logging
+import warnings
+warnings.filterwarnings('ignore')
+import argparse
 import os
 import sys
-import argparse
 from datetime import datetime
 
 import numpy as np
@@ -22,7 +25,23 @@ from torch.utils.data import DataLoader
 #from dataset import *
 from torch.autograd import Variable
 
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
+
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.WARNING)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.ERROR)
+
+logging.info('Start program')
+handler = logging.FileHandler('infor.log')
+handler.setLevel(logging.INFO)
+logging.basicConfig(filemode="w") 
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+logger.addHandler(handler)
 
 from conf import settings
 from utils_ai import build_network, get_training_dataloader, get_test_dataloader, WarmUpLR
@@ -31,7 +50,7 @@ def train(epoch):
 
     net.train()
     for batch_index, (images, labels) in enumerate(training_loader):
-        if epoch <= args.warm:
+        if epoch <= args_dict['warm']:
             warmup_scheduler.step()
 
         images = Variable(images)
@@ -59,7 +78,7 @@ def train(epoch):
             loss.item(),
             optimizer.param_groups[0]['lr'],
             epoch=epoch,
-            trained_samples=batch_index * args.b + len(images),
+            trained_samples=batch_index * args_dict['b'] + len(images),
             total_samples=len(training_loader.dataset)
         ))
 
@@ -113,6 +132,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', type=bool, default=True, help='whether shuffle the dataset')
     parser.add_argument('-warm', type=int, default=1, help='warm up training phase')
     parser.add_argument('-lr', type=float, default=0.1, help='initial learning rate')
+    args = parser.parse_args()
     args_dict = vars(parser.parse_args())
     net_type = args_dict['net']
     use_gpu = args_dict['gpu']
@@ -130,25 +150,25 @@ if __name__ == '__main__':
         settings.TRAIN_MEAN,
         settings.TRAIN_STD,
         train_path,
-        num_workers=args.w,
-        batch_size=args.b,
-        shuffle=args.s
+        num_workers=args_dict['w'],
+        batch_size=args_dict['b'],
+        shuffle=args_dict['s']
     )
     
     test_loader, idx_to_class = get_test_dataloader(
         settings.TRAIN_MEAN,
         settings.TRAIN_STD,
         test_path,
-        num_workers=args.w,
-        batch_size=args.b,
-        shuffle=args.s
+        num_workers=args_dict['w'],
+        batch_size=args_dict['b'],
+        shuffle=args_dict['s']
     )
     
     loss_function = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+    optimizer = optim.SGD(net.parameters(), lr=args_dict['lr'], momentum=0.9, weight_decay=5e-4)
     train_scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=settings.MILESTONES, gamma=0.2) #learning rate decay
     iter_per_epoch = len(training_loader)
-    warmup_scheduler = WarmUpLR(optimizer, iter_per_epoch * args.warm)
+    warmup_scheduler = WarmUpLR(optimizer, iter_per_epoch * args_dict['warm'])
     checkpoint_path = './checkpoint/results'
     
     #use tensorboard
@@ -166,7 +186,7 @@ if __name__ == '__main__':
 
     best_acc = 0.0
     for epoch in range(1, settings.EPOCH):
-        if epoch > args.warm:
+        if epoch > args_dict['warm']:
             train_scheduler.step(epoch)
 
         train(epoch)
@@ -174,6 +194,6 @@ if __name__ == '__main__':
 
         #start to save best performance model after learning rate decay to 0.01 
         if best_acc < acc:
-            torch.save(net.state_dict(), checkpoint_path.format(net=args.net, epoch=epoch, type='best'))
+            torch.save(net.state_dict(), checkpoint_path.format(net=args_dict['net'], epoch=epoch, type='best'))
             best_acc = acc
-            logger.info("Saving at epoch: ", epoch, " with accuracy: ", acc)
+            logger.info("Saving at epoch: " +  str(epoch) + " with accuracy: " + str(acc))
