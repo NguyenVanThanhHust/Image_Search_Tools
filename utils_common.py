@@ -22,7 +22,7 @@ def get_class_name_from_string(image_path):
         last_spe_char_pos = char_2_pos[-1]
     image_name = image_path[last_spe_char_pos + 1:len(image_path)]
     char_3_pos= [pos for pos, char in enumerate(image_name) if char == spe_char_3]
-    class_name = image_name[0:char_3_pos[0]]
+    class_name = image_path[char_1_pos[-2] + 1:char_1_pos[-1]]
     return class_name
 
 def copy_folder(class_name, ori_path, dst_path):

@@ -133,8 +133,6 @@ def predict():
         copy(path, RESULT_FOLDER)
     list_file = [f for f in os.listdir(RESULT_FOLDER) if os.path.isfile(os.path.join(RESULT_FOLDER, f))]
     filepaths = [os.path.join(RESULT_FOLDER, file) for file in list_file]
-    print("filepaths: ", filepaths)
-    path_1, path_2, path_3 = filepaths[0], filepaths[1], filepaths[2] 
     return render_template('predict.html', 
                         img_paths=filepaths, 
                         labels = labels)
@@ -144,7 +142,7 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     parser = argparse.ArgumentParser()
     parser.add_argument('-net', type=str, default= 'squeezenet', help='net type')
-    parser.add_argument('-weights', type=str, default='./checkpoint/results/sign_squeezenet-280-regular.pth', help='the weights file path you want to test')
+    parser.add_argument('-weights', type=str, default='./checkpoint/results/squeezenet-291-best.pth', help='the weights file path you want to test')
     parser.add_argument('-gpu', type=bool, default=True, help='use gpu or not')
     parser.add_argument('-w', type=int, default=4, help='number of workers for dataloader')
     parser.add_argument('-b', type=int, default=16, help='batch size for dataloader')
@@ -161,20 +159,20 @@ if __name__ == '__main__':
     net.load_state_dict(torch.load(args_dict['weights']), args_dict['gpu'])
     net.eval()
 
-    example_image_dir = '../datasets/Signature_Recognition/To_Use_Datasets/train'
+    example_image_dir = '../datasets/Image_Search_Dataset/train'
     dataset = datasets.ImageFolder(example_image_dir, transform= None)
     idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
     
-    original_path = "../datasets/Signature_Recognition/Original_Datasets"
-    list_author = next(os.walk(original_path))[1]
+    original_path = "../datasets/Image_Search_Dataset/train"
+    list_classes = next(os.walk(original_path))[1]
     if os.path.isfile('lsh.p'):
         logger.info("load indexed dict")
         lsh = pickle.load(open('lsh.p','rb'))
         feature_dict = pickle.load(open('feature_dict.p','rb'))
     else:
         logger.info("building dict")
-        train_image_dir = "../datasets/Signature_Recognition/To_Use_Datasets/train"
-        lsh, image_paths, list_features = create_feature(train_image_dir, list_author, net) 
+        train_image_dir = "../datasets/Image_Search_Dataset/train"
+        lsh, image_paths, list_features = create_feature(train_image_dir, list_classes, net) 
         feature_dict = dict(zip(image_paths, list_features))
         pickle.dump(lsh, open('lsh.p', "wb"))
         pickle.dump(feature_dict, open("feature_dict.p", "wb"))

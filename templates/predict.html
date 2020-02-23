@@ -14,13 +14,11 @@
   </style>
 </head>
 
-{%for i in range(0, 5)%}
+{%for i in range(0, 3)%}
 <div class="container">
   <p>{{labels[i]}}</p>
   <img src="{{img_paths[i]}}" width="200"/>
 </div>
 {%endfor%}
 </html>
-
-nvidia-docker run -it --name image_recognition --shm-size 32G -p 2345:2345 -v /home/ubuntu:/workspace/share nvcr.io/nvidia/pytorch:19.08-py3 ls
 

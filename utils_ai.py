@@ -241,7 +241,7 @@ def get_feature_single_img(net, image_path):
                         transforms.Normalize(settings.TRAIN_MEAN, 
                                              settings.TRAIN_STD)])
 
-    img = Image.open(image_path)
+    img = Image.open(image_path).convert('RGB')
     img_tensor = image_transforms(img)
     model = net
     if torch.cuda.is_available():
@@ -267,7 +267,7 @@ def create_feature(train_image_dir, classes, net):
     for each_object in classes:
         each_object_path = os.path.join(train_image_dir, each_object)
         list_img = next(os.walk(each_object_path))[2]
-        print("hassing class: ", each_object, " which has: ", len(list_img))
+        print("hashing class: ", each_object, " which has: ", len(list_img))
         for img in list_img:
             image_path = os.path.join(each_object_path, img)
             feature = get_feature_single_img(net, image_path)

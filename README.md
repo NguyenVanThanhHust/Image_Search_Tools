@@ -21,16 +21,10 @@ train_accu not saved
 accuracy 80% 
 
 python train.py -data_set ../datasets/Image_Search_Dataset/ -net squeezenet -w 2
-train_accu 88%
-accuracy 82%
-
-python train.py -net resnet18 -w 2
-
-python train.py -net shallow_resnet18 -w 2
-
+train_accu 72%
 
 ### 4. test model 
-python test_sign.py -net shallow_squeezenet -weights ./checkpoint/results/shallow_squeezenet-51-best.pth 
+python test_sign.py -net squeezenet -weights ./checkpoint/results/shallow_squeezenet-51-best.pth 
 I will update readme.
 
 You need to specify the net you want to train using arg -net
