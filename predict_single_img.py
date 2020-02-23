@@ -13,7 +13,7 @@ from torchvision import transforms
 from torchvision import datasets
 
 from conf import settings
-from utils import build_network
+from utils_ai import build_network
 
 logger = logging.getLogger(__name__)
 
@@ -32,14 +32,14 @@ handler.setFormatter(formatter)
 
 logger.addHandler(handler)
 
-def predict_author_single_img(model, image):
+def predict_single_img(model, image):
     device = torch.device("cuda")
     image_transforms =  transforms.Compose([
                         transforms.Resize((112, 112)),
                         transforms.ToTensor(),
-                        transforms.Normalize(settings.CIFAR100_TRAIN_MEAN, settings.CIFAR100_TRAIN_STD)])
+                        transforms.Normalize(settings.TRAIN_MEAN, settings.TRAIN_STD)])
 
-    test_img = Image.open(image)
+    test_img = Image.open(image).convert('RGB')
     test_img_tensor = image_transforms(test_img)
 
     if torch.cuda.is_available():
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-net', type=str, default= 'squeezenet', help='net type')
     parser.add_argument('-weights', type=str, 
-                        default='./checkpoint/results/sign_squeezenet-280-regular.pth',
+                        default='./checkpoint/results/squeezenet-291-best.pth',
                         help='the weights file path you want to test')
     
     parser.add_argument('-gpu', type=bool, default=True, help='use gpu or not')
@@ -83,19 +83,19 @@ if __name__ == '__main__':
     net.load_state_dict(torch.load(args_dict['weights']), args_dict['gpu'])
     net.eval()
 
-    test_image_dir = 'D:/SealProjectOLD/Datasets/images/val'
+    test_image_dir = '../datasets/Image_Search_Dataset/val'
     dataset = datasets.ImageFolder(test_image_dir, transform= None)
     idx_to_class = {v: k for k, v in dataset.class_to_idx.items()}
 
     count_authors = len([name for name in os.listdir(test_image_dir) if os.path.isdir(os.path.join(test_image_dir, name))])
-    json_file = open('author_data.json')
-    list_author = json.load(json_file)
-    logger.info("list_author:", list_author.keys())
-    for subfolder in list_author.keys():
-        subfolder_path = os.path.join(test_image_dir, subfolder)
+    
+    original_path = "../datasets/Image_Search_Dataset/val"
+    list_classes = next(os.walk(original_path))[1]
+    for each_class in list_classes:
+        class_path = os.path.join(test_image_dir, each_class)
 
-        for img in os.listdir(subfolder_path):
-            test_img_path = os.path.join(subfolder_path, img)
-            author, confidence = predict_author_single_img(net, test_img_path)
-            print("Author: ", subfolder, ", Predict: ",author, ", Confidence: ", confidence)
+        for img in os.listdir(class_path):
+            test_img_path = os.path.join(class_path, img)
+            label, confidence = predict_single_img(net, test_img_path)
+            print("Class: ", each_class, ", Predict: ",label, ", Confidence: ", confidence)
             
