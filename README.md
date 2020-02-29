@@ -1,19 +1,21 @@
 # Image_Search Tools
 Image_Search Tools
 
+This is forked from 
+
 # to predict single image 
-python signature_predict_single_img.py
+python predict_single_img.py
 
 ## Requirements
 - python3.6
-- pytorch1.3.1
+- pytorch1.4
 - cuda10.1
 - cudnnv7
 
 ## Usage
 
 ### 2. dataset 
-Seal Dataset from customer
+101 Datasets
 
 ### 3. train the model
 python train.py -net squeezenet 
@@ -24,7 +26,6 @@ python train.py -data_set ../datasets/Image_Search_Dataset/ -net squeezenet -w 2
 train_accu 72%
 
 ### 4. test model 
-python test_sign.py -net squeezenet -weights ./checkpoint/results/shallow_squeezenet-51-best.pth 
 I will update readme.
 
 You need to specify the net you want to train using arg -net
@@ -126,38 +127,4 @@ better result.
 |cifar100|mobilenet|3.3M|34.02|10.56|0.69GB|60|60|40|40|200|
 |cifar100|mobilenetv2|2.36M|31.92|09.02|0.84GB|60|60|40|40|200|
 |cifar100|squeezenet|0.78M|30.59|8.36|0.73GB|60|60|40|40|200|
-|cifar100|shufflenet|1.0M|29.94|8.35|0.84GB|60|60|40|40|200|
-|cifar100|shufflenetv2|1.3M|30.49|8.49|0.78GB|60|60|40|40|200|
-|cifar100|vgg11_bn|28.5M|31.36|11.85|1.98GB|60|60|40|40|200|
-|cifar100|vgg13_bn|28.7M|28.00|9.71|1.98GB|60|60|40|40|200|
-|cifar100|vgg16_bn|34.0M|27.07|8.84|2.03GB|60|60|40|40|200|
-|cifar100|vgg19_bn|39.0M|27.77|8.84|2.08GB|60|60|40|40|200|
-|cifar100|resnet18|11.2M|24.39|6.95|3.02GB|60|60|40|40|200|
-|cifar100|resnet34|21.3M|23.24|6.63|3.22GB|60|60|40|40|200|
-|cifar100|resnet50|23.7M|22.61|6.04|3.40GB|60|60|40|40|200|
-|cifar100|resnet101|42.7M|22.22|5.61|3.72GB|60|60|40|40|200|
-|cifar100|resnet152|58.3M|22.31|5.81|4.36GB|60|60|40|40|200|
-|cifar100|preactresnet18|11.3M|27.08|8.53|3.09GB|60|60|40|40|200|
-|cifar100|preactresnet34|21.5M|24.79|7.68|3.23GB|60|60|40|40|200|
-|cifar100|preactresnet50|23.9M|25.73|8.15|3.42GB|60|60|40|40|200|
-|cifar100|preactresnet101|42.9M|24.84|7.83|3.81GB|60|60|40|40|200|
-|cifar100|preactresnet152|58.6M|22.71|6.62|4.20GB|60|60|40|40|200|
-|cifar100|resnext50|14.8M|22.23|6.00|1.91GB|60|60|40|40|200|
-|cifar100|resnext101|25.3M|22.22|5.99|2.63GB|60|60|40|40|200|
-|cifar100|resnext152|33.3M|22.40|5.58|3.18GB|60|60|40|40|200|
-|cifar100|attention59|55.7M|33.75|12.90|3.47GB|60|60|40|40|200|
-|cifar100|attention92|102.5M|36.52|11.47|3.88GB|60|60|40|40|200|
-|cifar100|densenet121|7.0M|22.99|6.45|1.28GB|60|60|40|40|200|
-|cifar100|densenet161|26M|21.56|6.04|2.10GB|60|60|60|40|200|
-|cifar100|densenet201|18M|21.46|5.9|2.10GB|60|60|40|40|200|
-|cifar100|googlenet|6.2M|21.97|5.94|2.05GB|60|60|40|40|200|
-|cifar100|inceptionv3|22.3M|22.81|6.39|2.26GB|60|60|40|40|200|
-|cifar100|inceptionv4|41.3M|24.14|6.90|4.11GB|60|60|40|40|200|
-|cifar100|inceptionresnetv2|65.4M|27.51|9.11|4.14GB|60|60|40|40|200|
-|cifar100|xception|21.0M|25.07|7.32|1.67GB|60|60|40|40|200|
-|cifar100|seresnet18|11.4M|23.56|6.68|3.12GB|60|60|40|40|200|
-|cifar100|seresnet34|21.6M|22.07|6.12|3.29GB|60|60|40|40|200|
-|cifar100|seresnet50|26.5M|21.42|5.58|3.70GB|60|60|40|40|200|
-|cifar100|seresnet101|47.7M|20.98|5.41|4.39GB|60|60|40|40|200|
-|cifar100|seresnet152|66.2M|20.66|5.19|5.95GB|60|60|40|40|200|
-|cifar100|nasnet|5.2M|22.71|5.91|3.69GB|60|60|40|40|200|
+
