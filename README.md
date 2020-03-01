@@ -1,5 +1,5 @@
-# Image_Search Tools
-Image_Search Tools
+# Image Search
+Image Search
 
 This is built based on https://github.com/weiaicunzai/pytorch-cifar100
 
