@@ -6,7 +6,7 @@ import os
 import sys
 import random
 
-from utils import copy_folder
+from utils_common import copy_folder
 
 logger = logging.getLogger(__name__)
 
