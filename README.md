@@ -13,10 +13,13 @@ This is built based on https://github.com/weiaicunzai/pytorch-cifar100
 ### 2. dataset 
 Caltech101 Datasets
 Create training dataset with only 10 classes
-
+```
 python create_dataset.py -idp your_101_ObjectCategories_folder -out your_output_dataset_folder
-Ex: python create_dataset.py -idp ../../datasets/101_ObjectCategories -out ../../datasets/Image_Search_Dataset
-
+```
+Ex: 
+```
+python create_dataset.py -idp ../../datasets/101_ObjectCategories -out ../../datasets/Image_Search_Dataset
+```
 This will create new folder Image_Search_Dataset in with train/val/test/ = 0.7/0.15/0.15
 ### 3. train the model
 You need to specify the net you want to train using arg -net
@@ -76,8 +79,10 @@ Normally, the weights file with the best accuracy would be written to the disk w
 I will update later.
 
 ### 5. Siple user interface
+Run cmd
+```
 python server.py
-
+```
 If you haven't indexed extracted feature, it will indexing and else it just load lsh.p and feature_dict.p.
 
 go to: localhost:5000 and test yourself.
